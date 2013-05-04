@@ -1,0 +1,39 @@
+<head>
+    <p>Title: <input data-bind='value: firstName' size=50 /></p> 
+    <h2>The title is: <span data-bind='text: firstName'> </span></h2>  
+    <p><img data-bind='attr:{src: shownImg}'></img></p>
+    <button data-bind='click: getJSON'>Get Corg</button>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/knockout/2.2.1/knockout-min.js"></script>
+	<script type="text/javascript"> 
+			// Here's my data model
+			var ViewModel = function(first) {
+				var self = this;
+			    this.firstName = ko.observable(first || "Nothing shown");
+			    this.shownImg = ko.observable('');
+			    this.cats = [];
+			    this.catIndex = ko.observable(0);
+			 
+			    this.getJSON = function getJSON()
+			    	{
+			    		if ( this.cats.length && this.catIndex() != this.cats.length - 1 )
+		    				{
+		    				this.catIndex( this.catIndex() + 1 );	
+		    				this.firstName( this.cats[ this.catIndex() ].title );
+		    				this.shownImg( this.cats[ this.catIndex() ].media.m );
+		    				}
+			    		else
+			    			{ 
+			    			$.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?tags=corgi&tagmode=any&format=json&jsoncallback=?", function(data) { 
+				    		   	this.cats = data.items;
+							    this.firstName( data.items[0].title );
+							    this.shownImg( data.items[0].media.m );
+							    this.catIndex(0);
+								}.bind(this));
+			    			}
+			    	}.bind(this);
+			};
+			 
+			ko.applyBindings(new ViewModel()); // This makes Knockout get to work
+	</script>
+</head>
